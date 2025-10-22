@@ -29,11 +29,17 @@ Los robots comienzan en el borde gris, el pato en el centro y el resto de los an
 - Robots: pueden moverse hasta 2 espacios en terrenos llanos, pero solo 1 en montañas.
 - Animales: pueden moverse hasta 2 espacios, excepto el alce, que se mueve hasta 3. El pato que en agua puede moverse hasta 3 espacios tambien.
 
+## Ataque 
+Si un jugador está frente a su contrincante lanza un dado de 6 caras. Un resultado de 4 a 6 indica un ataque exitoso, que reduce 1 punto de vida del oponente. Si el resultado es de 1 a 3 no comete el ataque.
 
 ## Objetivo 
 - El objetivo de los animales es proteger al pato
 - El objetivo del pato es huir de los robots
 - El objetivo de los robots es llegar al pato y matarlo
+
+## Condiciones de victoria y puntuacion
+- Victoria de los Robots: Matan al Pato antes de 25 turnos ganan.
+- Victoria de los Animales: Protegen al Pato hasta el turno 25 ganan.
 
 ## Próximos pasos para versión digital
 
