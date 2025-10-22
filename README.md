@@ -42,3 +42,7 @@ Los robots comienzan en el borde gris, el pato en el centro y el resto de los an
 - Implementar sistema de turnos y dado virtual.
 - Programar habilidades de cada personaje.
 - Añadir condiciones de victoria automáticas.
+
+![tablero](assests/tableropato.png)
+![personajes](assests/cartasPAto1.png)
+![personajes](assests/cartasPato2.png)
