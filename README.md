@@ -49,6 +49,6 @@ Si un jugador está frente a su contrincante lanza un dado de 6 caras. Un result
 - Programar habilidades de cada personaje.
 - Añadir condiciones de victoria automáticas.
 
-![tablero](assests/tableropato.png)
+![tablero](assests/defTABLERO.png)
 ![personajes](assests/cartasPAto1.png)
 ![personajes](assests/cartasPato2.png)
