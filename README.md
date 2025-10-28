@@ -22,7 +22,7 @@ Los robots comienzan en el borde gris, el pato en el centro y el resto de los an
 - Oso: Haces 2 puntos de daño al atacar, tienes 2 vidas.
 - Zarigüeya: Puedes esquivar un ataque si te atacan primero, tienes 2 vidas.
 - Alce: Puedes moverte hasta 3 casillas por turno, tienes 2 vidas
-- Robot: En montañas solo te puedes mover una casilla, tienes 3 vida
+- Robot malo: En montañas solo te puedes mover una casilla, tienes 3 vida
 - Pato: En el agua puedes moverte 3 casillas, eres el objetivo a matar solo tienes 1 vida.
 
 ## Movimiento

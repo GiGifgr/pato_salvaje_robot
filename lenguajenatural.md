@@ -1,137 +1,96 @@
 # Lenguaje Natural
-## 1) Componentes del juego (versión digital)
 
-- **Tablero:** Es una cuadrícula de hexágonos (figuras de seis lados) donde cada celda tiene un tipo de terreno: **Bosque**, **Montaña**, **Agua** o **Llanura**.  
-  El **borde gris** representa la zona donde inician los **Robots enemigos**.
-
-- **Unidades (♥ = cantidad de vidas máximas):**
-  - **Pato (1♥):** Es el objetivo a eliminar. En el agua puede moverse hasta **3 casillas hexagonales** por turno.  
-  - **Zarigüeya (2♥):** Puede **esquivar el primer ataque** que reciba si la atacan primero (solo una vez en toda la partida).  
-  - **Alce (2♥):** Puede moverse hasta **3 casillas** por turno.  
-  - **Oso (2♥):** Sus ataques causan **2 puntos de daño**.  
-  - **Zorro (2♥):** Si ataca por detrás, hace **2 puntos de daño**; en cualquier otro caso, **1 punto**.  
-  - **Robot aliado (3♥):** Puede **bloquear un ataque** que vaya hacia sí mismo, hacia el Pato o hacia otro aliado.  
-    Solo puede usar su habilidad o atacar una vez cada **3 turnos**.  
-    Cuando usa una de esas acciones, debe esperar 3 turnos para volver a hacerlo. Mientras tanto puede moverse, pero no atacar ni activar el escudo.  
-  - **Robot enemigo (3♥):** Se mueve **2 casillas** en terreno llano y **1 casilla** en montaña. En agua o bosque se mueve igual que en llanura.
-
-- **Orientación (dirección):** Cada unidad tiene una dirección hacia donde mira.  
-  Esta dirección cambia cuando se mueve (según la última casilla a la que avanzó).
-
-- **Adyacencia:** Dos unidades son adyacentes si están en hexágonos que se tocan por un lado (no por las esquinas).
-
-- **Ocupación:** Solo puede haber **una unidad por cada casilla**.
+##  Inicio
+1. El juego comienza mostrando la pantalla principal.
+2. El sistema solicita ingresar el **número de jugadores** (mínimo 2, máximo 12).
+3. Se pide escribir el **nombre de cada jugador** y seleccionar el **bando** correspondiente:
+   - Jugador A: **Animales** (incluye al **Pato**, aunque sea un turno aparte).
+   - Jugador B: **Robots enemigos**.
+   - Si hay **más de 2 jugadores**, se dividen los personajes del mismo bando entre los jugadores (todos juegan en la misma computadora).
 
 
-## 2) Preparación de la partida
 
-1. Cargar el tablero con sus tipos de terreno.  
-2. Colocar los **Robots enemigos** en el borde gris.  
-3. Colocar el **Pato** en el centro, dentro del agua.  
-4. Colocar los **Animales** en el lado opuesto al de los Robots.  
-5. Asignar vidas, direcciones iniciales (mirando hacia el enemigo), y activar habilidades según corresponda.  
-6. Definir el orden en que se moverán:
-   - Animales: **Zorro → Robot aliado → Oso → Zarigüeya → Alce → Pato**
-   - Robots enemigos: de izquierda a derecha.  
-7. Iniciar el contador de turnos con ronda = 1.
-
-
-## 3) Estructura del turno (por rondas)
-
-Cada ronda tiene **dos fases**:
-
-1. **Fase de los Animales:** cada Animal vivo actúa una vez en el orden indicado.  
-2. **Fase de los Robots:** cada Robot enemigo vivo actúa una vez en su orden.
-
-**Al final de la ronda:**
-- Aumentar el número de ronda (ronda = ronda + 1).  
-- Si el **Pato** sigue vivo y ya pasaron **25 rondas**, los **Animales ganan**.  
-- Si el **Robot aliado** usó su escudo o atacó, reducir en 1 el número de turnos que le faltan para volver a usar su habilidad.
+##  Preparación del juego
+1. El **tablero se carga automáticamente** con todas las piezas en su posición inicial.
+   - Robots en el borde gris.
+   - Pato en el centro acuático.
+   - Animales en la orilla opuesta.
+2. Se inicializa el **contador de rondas = 1** (máximo 20 rondas posibles).
+3. (Opcional) Si se activa el modo equilibrado:
+   - Cada bando lanza un dado para decidir quién comienza la primera ronda.
+   - El orden de los turnos se ajusta según el resultado (por ejemplo: si ganan los Robots, inician ellos, luego los Animales y finalmente el Pato).
 
 
-## 4) Secuencia del turno de una unidad
 
-Cada unidad viva, cuando le toca su turno, sigue este orden:
+## Inicio de ronda
+1. Cada ronda sigue este **orden de turnos**:
+   1. **Turno del Pato:** se mueve pero **no puede atacar**.
+   2. **Turno de los Robots enemigos.**
+   3. **Turno de los Animales** (sin contar al Pato).
 
-### Movimiento
-- **Animales:** pueden moverse hasta 2 casillas. El **Alce** puede moverse hasta 3.  
-- **Robots enemigos:** pueden moverse 2 en llanura y 1 en montaña.  
-- **Pato:** puede moverse 3 casillas si termina en el agua; en otro tipo de terreno, solo 2.  
-- Ninguna unidad puede pasar por encima de otra ni salir del área del mapa.  
-- Al finalizar su movimiento, la unidad actualiza su dirección según hacia dónde se movió.
-
-### Habilidad especial
-- **Robot aliado:**  
-  - Si su habilidad está disponible, puede **elegir una acción:**
-    1. Activar un **escudo de protección** sobre una unidad aliada cercana (a una casilla de distancia o sobre sí mismo).  
-       El escudo bloquea un ataque y luego desaparece.  
-    2. **Atacar** (ver reglas de ataque más abajo).  
-  - Después de usar cualquiera de esas dos acciones, debe esperar **3 turnos** antes de volver a usarlas.  
-- **Zarigüeya:** Su habilidad de esquivar se usa automáticamente la primera vez que la atacan.  
-- **Zorro, Oso, Alce, Pato y Robots enemigos:** tienen habilidades pasivas (siempre activas).
-
-### Ataque
-Una unidad puede atacar si hay un enemigo **al frente y en una casilla adyacente**.
-
-1. Comprobar si el objetivo está en la dirección hacia donde mira el atacante.  
-2. Lanzar un dado de seis caras:  
-   - Si sale **4, 5 o 6**, el ataque acierta.  
-   - Si sale **1, 2 o 3**, el ataque falla.  
-3. Si acierta, aplicar el daño según el tipo de unidad:  
-   - Ataque normal: 1 punto de daño.  
-   - **Oso:** hace 2 puntos.  
-   - **Zorro:** hace 2 puntos si ataca por detrás del enemigo; en otro caso, 1 punto.  
-4. Antes de aplicar el daño, comprobar defensas:
-   - Si el objetivo tiene un **escudo del Robot aliado**, el ataque se bloquea y el escudo se elimina.  
-   - Si el objetivo es la **Zarigüeya** y es su **primer ataque recibido**, lo esquiva completamente y no recibe daño.  
-5. Aplicar el daño restante.  
-   - Si la vida del objetivo llega a 0, se elimina del tablero.  
-   - Si el eliminado es el **Pato**, los **Robots ganan automáticamente**.
-
-> Todos los personajes pueden atacar en cada turno si cumplen las condiciones, excepto el Robot aliado, que debe esperar 3 turnos después de usar su habilidad o atacar.
+2. En cada turno:
+   - El jugador elige **dirección y número de casillas a moverse**, dependiendo del **tipo de terreno** y de su **bando**.
+     - Robots: 2 casillas en terreno llano, 1 en montaña.
+     - Animales: 2 casillas, excepto el Alce (3).
+     - Pato: 3 casillas en agua.
 
 
-## 5) Movimiento según el terreno
+## Ataque
+1. Después de moverse, el sistema pregunta:  
+   **¿Hay un enemigo al frente y adyacente?**
+   - Si **no**, el turno termina y pasa al siguiente jugador.
+   - Si **sí**, se lanza el **dado de 6 caras**.
 
-- **Montaña:** los Robots enemigos solo pueden moverse una casilla por turno.  
-- **Agua:** el Pato puede moverse hasta tres casillas si termina en una celda de agua.  
-- **Bosque y Llanura:** no tienen modificaciones.  
-- No se puede mover en diagonal; el movimiento siempre es entre los seis lados de cada hexágono.
+2. **Resultado del dado:**
+   - Si sale **4, 5 o 6**, el ataque **es exitoso**.
+   - Si sale **1, 2 o 3**, el ataque **falla** y se pasa al siguiente jugador.
 
-
-## 6) Ataque por detrás (Zorro)
-
-- Tomar la dirección hacia donde mira el enemigo.  
-- Identificar cuál es la casilla que está justo **detrás** de él.  
-- Si el **Zorro** está en esa posición al atacar, se considera un **ataque por detrás** y hace **2 puntos de daño**.  
-- Si está en otro lado, su ataque hace el daño normal (1 punto).
-
-
-## 7) Orden correcto al resolver un combate
-
-1. El atacante elige un enemigo adyacente al frente.  
-2. Si es el Zorro, se comprueba si está atacando por detrás.  
-3. Se lanza el dado (4–6 acierta, 1–3 falla).  
-4. Si acierta, se revisa si el objetivo tiene un escudo.  
-5. Si no hay escudo y el objetivo es la Zarigüeya, revisar si puede esquivar.  
-6. Aplicar el daño correspondiente.  
-7. Si el **Pato** muere, los Robots ganan automáticamente.
+3. Si el ataque acierta:
+   - Se aplica el **daño correspondiente** dependiendo del atacante:
+     - Zorro: 1 de daño, o 2 si ataca por detrás.
+     - Oso: 2 puntos de daño.
+     - Robots enemigos: 1 punto (o 2 si se usa la versión balanceada).
+     - Robot aliado: 1 punto y puede bloquear ataques cada 3 turnos.
+     - Zarigüeya: puede esquivar el primer ataque recibido si no atacó antes.
+   - Se resta el daño a las **vidas del objetivo**.
 
 
-## 8) Condiciones de victoria
 
-- **Robots:** ganan si logran eliminar al Pato antes de terminar la ronda número 25.  
-- **Animales:** ganan si el Pato sobrevive hasta el final de la ronda número 25.  
-- También se considera **Victoria de los Animales** si todos los Robots son eliminados antes de ese momento.
+## Eliminación
+1. El sistema revisa si el objetivo **quedó sin vidas**:
+   - Si no, el turno termina.
+   - Si sí, se **retira la unidad del tablero**.
+   - Si el personaje eliminado pertenece a un jugador, ese jugador ya **no puede participar** (solo observa el resto del juego).
+
+2. Si la unidad eliminada es el **Pato**, el sistema declara **victoria inmediata de los Robots**.
 
 
-## 9) Reglas para evitar errores en la versión digital
 
-- No permitir movimientos fuera del tablero o sobre otra unidad.  
-- No permitir ataques si el enemigo no está adyacente o no está al frente.  
-- No permitir que el Robot aliado use su escudo o ataque antes de que pasen los tres turnos de espera.  
-- Si el Pato intenta moverse a una casilla inválida, el movimiento se cancela.  
-- Después de cada ataque o eliminación, comprobar si se cumple alguna condición de victoria.
+## Fin de ronda
+1. Cuando todos los jugadores han actuado, se **aumenta el contador de rondas +1**.
+2. Se verifica si el **Pato sigue vivo** y si **ya se alcanzaron las 20 rondas**:
+   - Si **sí** (ronda > 20 y el Pato sigue vivo), se declara **victoria de los Animales**.
+   - Si **no**, el ciclo continúa con la siguiente ronda.
+
+
+
+## Condiciones de victoria
+- **Victoria de los Robots:** si el Pato muere en cualquier momento antes de la ronda 20.
+- **Victoria de los Animales:** si el Pato sobrevive hasta el final de la ronda 20.
+- El juego finaliza automáticamente mostrando el resultado y los nombres de los jugadores ganadores.
+
+
+
+## Resumen visual del flujo
+1. Inicio → Configuración → Tablero listo → Inicio de ronda  
+2. Movimiento → Ataque (si hay enemigo) → Evaluar daño → Retirar unidades  
+3. Revisión de victoria → Siguiente ronda o fin de juego
+
+
+
+> **Nota:** El Pato nunca puede atacar, y siempre tiene su propio turno, incluso si los Animales ya actuaron.  
+> Esto asegura que el orden de juego se mantenga balanceado y claro.
+
 
 
 ![Ejemplo](assests/ejemplotablero.png)
