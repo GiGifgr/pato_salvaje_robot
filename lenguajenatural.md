@@ -16,9 +16,7 @@
    - Pato en el centro acuático.
    - Animales en la orilla opuesta.
 2. Se inicializa el **contador de rondas = 1** (máximo 20 rondas posibles).
-3. (Opcional) Si se activa el modo equilibrado:
-   - Cada bando lanza un dado para decidir quién comienza la primera ronda.
-   - El orden de los turnos se ajusta según el resultado (por ejemplo: si ganan los Robots, inician ellos, luego los Animales y finalmente el Pato).
+
 
 
 
@@ -32,7 +30,7 @@
    - El jugador elige **dirección y número de casillas a moverse**, dependiendo del **tipo de terreno** y de su **bando**.
      - Robots: 2 casillas en terreno llano, 1 en montaña.
      - Animales: 2 casillas, excepto el Alce (3).
-     - Pato: 3 casillas en agua.
+     - Pato: 3 casillas en agua, 1 en tierra
 
 
 ## Ataque
@@ -49,8 +47,8 @@
    - Se aplica el **daño correspondiente** dependiendo del atacante:
      - Zorro: 1 de daño, o 2 si ataca por detrás.
      - Oso: 2 puntos de daño.
-     - Robots enemigos: 1 punto (o 2 si se usa la versión balanceada).
-     - Robot aliado: 1 punto y puede bloquear ataques cada 3 turnos.
+     - Robots enemigos: 1 punto 
+     - Robot aliado: 1 punto pero solo puede bloquear ataques o atacar cada 3 turnos. 
      - Zarigüeya: puede esquivar el primer ataque recibido si no atacó antes.
    - Se resta el daño a las **vidas del objetivo**.
 
@@ -60,7 +58,7 @@
 1. El sistema revisa si el objetivo **quedó sin vidas**:
    - Si no, el turno termina.
    - Si sí, se **retira la unidad del tablero**.
-   - Si el personaje eliminado pertenece a un jugador, ese jugador ya **no puede participar** (solo observa el resto del juego).
+   - Si el personaje eliminado pertenece a un jugador, ese jugador ya **no puede participar** (dependiendo del numero de jugadores).
 
 2. Si la unidad eliminada es el **Pato**, el sistema declara **victoria inmediata de los Robots**.
 
