@@ -28,3 +28,19 @@ Inventario de actividades:
 - Revisión visual general del juego.  
 - Pruebas de funcionamiento y corrección de errores.
 - ⁠Apoyo en programación.
+
+# Federico Marquez Martinez 
+
+![Federico](./assests/Fede.jpg)
+
+Rol en el proyecto:
+Asistente de apoyo general. Colabora en tareas básicas dentro de la versión digital. Su participación se enfoca en apoyo a los demás miembros, organización de recursos y documentación básica.
+
+Inventario de actividades:
+- Apoyo en la preparación. 
+- Colaboración en pruebas de juego y feedback.  
+- Búsqueda de referencias visuales.  
+- Registro de observaciones en los test de jugabilidad.  
+- Apoyo en la documentación y revisión general.
+- ⁠Apoyo de ideas al proyecto.
+- ⁠Apoyo en lo que se necesite.
