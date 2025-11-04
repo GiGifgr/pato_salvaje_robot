@@ -42,3 +42,26 @@ Link para el prototipo de Base44: https://batalla-del-pato-e9da3b57.base44.app
 ![PrototipoLovable](./assests/LovablePrototipo.png)
 
 Link para el prototipo de Lovable: https://lovable.dev/projects/a8902522-1ad5-4c8b-9303-689d650954b4?magic_link=mc_8fe2fb0a-8c2c-4313-a7b2-af4189be71df
+
+
+## Ias usadas para crear los otros prototipos por Felipe:
+Google Ai Studio
+
+Firebase Studio
+
+### Google Ai Studio
+![Prototipo1](./assests/prototipo1.png)
+
+![Prototipo1](./assests/prototipo1.1.png)
+
+![Prototipo1](./assests/prototipo1.2.png)
+
+### Firebase Studio
+
+![Prototipo2](./assests/prototipo2.png)
+
+![Prototipo2](./assests/prototipo2.1.png)
+
+![Prototipo2](./assests/prototipo2.2.png)
+
+![Prototipo2](./assests/prototipo2.3.png)
