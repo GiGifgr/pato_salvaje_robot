@@ -46,9 +46,9 @@ Link para el prototipo de Lovable: https://lovable.dev/projects/a8902522-1ad5-4c
 
 ## Ias usadas para crear los otros prototipos por Felipe:
 Google Ai Studio
-
+[link](https://ai.studio/apps/drive/1K0oUJDc-YLoSrYYXXwCUmhmGP2xCdjO5)
 Firebase Studio
-
+[Link](https://9000-firebase-studio-1762223075542.cluster-hkcruqmgzbd2aqcdnktmz6k7ba.cloudworkstations.dev)
 ### Google Ai Studio
 ![Prototipo1](./assests/prototipo1.png)
 
