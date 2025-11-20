@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protege al Pato - Sitio Oficial</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f2f2f2;
+            color: #222;
+        }
+
+        header {
+            background: #40c518;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        nav {
+            background: #10610b;
+            padding: 12px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        section {
+            padding: 40px;
+            background: white;
+            margin: 20px auto;
+            max-width: 1100px;
+            border-radius: 10px;
+        }
+
+        h2 {
+            color: #004900;
+        }
+
+        .juego {
+            width: 100%;
+            height: 500px;
+            background: #ddf3e5;
+            border: 2px dashed #00ffa6;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: #196924;
+        }
+
+        .personajes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .personajes img {
+            width: 180px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .mapa {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .juego { height: 300px; }
+            .personajes img { width: 100%; max-width: 250px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Protege al Pato</h1>
+</header>
+
+<nav>
+    <a href="#inicio">Inicio</a>
+    <a href="#historia">Historia</a>
+    <a href="#mecanicas">Mecánicas</a>
+    <a href="#acerca">Acerca</a>
+</nav>
+
+
+<!-- ===========================
+            INICIO
+=========================== -->
+<section id="inicio">
+    <h2>Inicio</h2>
+    <p>A continuación se muestra el videojuego final del proyecto.</p>
+
+    <div class="juego">
+        Aquí va el videojuego terminado (iframe o build WebGL).
+    </div>
+</section>
+
+
+
+<!-- ===========================
+            HISTORIA
+=========================== -->
+<section id="historia">
+    <h2>Historia</h2>
+
+    <p>
+        En una isla remota un nuevo peligro emerge cuando un grupo de robots
+         desorientados llega tras un naufragio masivo, muy parecido al accidente
+          que originó a Roz en Robot Salvaje. Estos robots, programados para 
+          sobrevivir a toda costa, detectan en el pequeño Pato una fuente 
+          biológica que consideran esencial para reactivar sus sistemas dañados.
+           Al notar esta amenaza, los animales de la isla
+           se unen para proteger al Pato, pues representa no solo una vida 
+           inocente, sino un símbolo del delicado equilibrio de la isla. 
+           Entre ellos está también un robot aliado, uno que, al igual que Roz,
+            desarrolla conciencia y decide proteger la vida en lugar de destruirla
+            . Ahora, animales y un robot arrepentido deben colaborar para impedir
+             que la oleada mecánica capture al Pato antes del turno 20 y 
+             desequilibre para siempre la paz del ecosistema.
+    </p>
+
+
+
+    <h3>Mapa de la Isla</h3>
+    <img class="mapa" src="assetsJUEGO/mapa.png" alt="Mapa del juego">
+</section>
+
+
+
+<!-- ===========================
+            MECÁNICAS
+=========================== -->
+<section id="mecanicas">
+    <h2>Mecánicas del Juego</h2>
+
+    <h3>Personajes y habilidades</h3>
+
+    <div class="personajes">
+      <img src="assetsJUEGO/tarjetas.png" style="width: 100%; max-width: 900px;">
+
+
+        
+    </div>
+
+    <h3>Movimientos</h3>
+    <ul>
+        <li><strong>Robots:</strong> 2 casillas (1 en montaña).</li>
+        <li><strong>Animales:</strong> 2 casillas (Alce: 3 casillas).</li>
+        <li><strong>Pato:</strong> 3 en agua, 1 en tierra.</li>
+    </ul>
+
+    <h3>Ataque</h3>
+    <p>Solo si el enemigo está al frente y adyacente.</p>
+    <p>Dado de 6 caras:</p>
+    <ul>
+        <li>4–6 → éxito</li>
+        <li>1–3 → falla</li>
+    </ul>
+
+    <h3>Daños</h3>
+    <ul>
+        <li>Zorro: 1 daño, 2 por la espalda.</li>
+        <li>Oso: 2 daños.</li>
+        <li>Zarigüeya: esquiva un ataque si no atacó antes.</li>
+        <li>Alce: mueve 3 casillas.</li>
+        <li>Robot aliado: bloquea un ataque cada 3 turnos.</li>
+        <li>Robot malo: 3 vidas.</li>
+        <li>Pato: 1 vida, no ataca.</li>
+    </ul>
+
+    <h3>Turnos</h3>
+    <ol>
+        <li>Pato</li>
+        <li>Robots</li>
+        <li>Animales</li>
+    </ol>
+
+    <h3>Condiciones de Victoria</h3>
+    <ul>
+        <li>Robots ganan si matan al Pato antes del turno 20.</li>
+        <li>Animales ganan si el Pato sobrevive hasta el turno 20.</li>
+    </ul>
+</section>
+
+
+
+<!-- ===========================
+            ACERCA
+=========================== -->
+<section id="acerca">
+    <h2>Acerca</h2>
+
+    <p>
+        Este proyecto comenzó como un juego de mesa físico y evolucionó 
+        a una versión digital como parte del trabajo semestral. El proceso
+        incluyó diseño del mapa, creación del sistema de turnos, adaptación
+        de reglas, desarrollo del prototipo digital y documentación.
+    </p>
+
+    <p>
+        Se utilizaron herramientas como editores de imagen, motores de juego,
+        repositorios GitHub, y asistencia de IA para estructurar información,
+        generar texto, apoyar en documentación y refinar ideas. Cada integrante
+        aportó en áreas como arte, programación, documentación y pruebas.
+    </p>
+
+    <p>
+        El objetivo final es mostrar un videojuego funcional, responsivo y con
+        mecánicas fieles a la versión de tablero.
+    </p>
+</section>
+
+</body>
+</html>
