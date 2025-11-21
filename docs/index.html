@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Protege al Pato - Juego</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: #0b2413;
+      color: #f5f5f5;
+    }
+
+    #game-root {
+      max-width: 1400px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    #left-panel {
+      flex: 3;
+      background: #082010;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #right-panel {
+      flex: 2;
+      background: #08130b;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.4rem;
+      text-align: center;
+      color: #80ff9c;
+    }
+
+    #top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    .tag-pato { background:#ffe66d; color:#333; }
+    .tag-animals { background:#32c96b; }
+    .tag-robots { background:#ff5e5e; }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: #23c36b;
+      color: #02100a;
+      transition: transform .08s ease, box-shadow .08s ease, background .15s;
+      box-shadow: 0 0 0 rgba(0,0,0,0);
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,.4);
+      background:#33d47c;
+    }
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow:none;
+    }
+
+    #canvas-wrapper {
+      position: relative;
+      flex: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid #235b37;
+      background:#0a2b16;
+    }
+
+    #gameCanvas {
+      width: 100%;
+      display:block;
+      background:#000;
+    }
+
+    #tooltip {
+      position:absolute;
+      pointer-events:none;
+      background: rgba(10,20,10,.92);
+      border-radius:8px;
+      padding:6px 8px;
+      font-size:0.75rem;
+      border:1px solid rgba(128,255,172,.3);
+      display:none;
+      z-index:5;
+      white-space:nowrap;
+    }
+
+    #dice-panel {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      justify-content:flex-end;
+    }
+
+    #dice-visual {
+      width:34px;
+      height:34px;
+      border-radius:8px;
+      border:2px solid #36d47d;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#02150b;
+      position:relative;
+    }
+    .pip {
+      width:5px;
+      height:5px;
+      border-radius:50%;
+      background:#36d47d;
+      position:absolute;
+    }
+
+    #info-turno {
+      background:#07140c;
+      border-radius:10px;
+      padding:8px 10px;
+      font-size:0.82rem;
+      border:1px solid rgba(128,255,172,.25);
+    }
+
+    #info-unidad {
+      background:#07140c;
+      border-radius:10px;
+      padding:10px;
+      border:1px solid rgba(128,255,172,.25);
+      font-size:0.84rem;
+    }
+
+    #info-unidad h2 {
+      margin:0 0 6px;
+      font-size:1rem;
+      color:#80ff9c;
+    }
+
+    .hp-bar {
+      height:8px;
+      border-radius:999px;
+      background:#28352f;
+      overflow:hidden;
+      margin:4px 0 8px;
+    }
+    .hp-fill {
+      height:100%;
+      background:linear-gradient(90deg,#ff6b6b,#ffd166);
+    }
+
+    #log {
+      flex:1;
+      background:#020806;
+      border-radius:10px;
+      padding:8px;
+      border:1px solid rgba(128,255,172,.2);
+      font-size:0.78rem;
+      overflow-y:auto;
+    }
+    #log p {
+      margin:2px 0;
+    }
+
+    /* Overlay de configuración con 2–12 jugadores */
+    #config-overlay {
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.75);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:20;
+    }
+    #config-card {
+      background:#04130a;
+      border-radius:14px;
+      padding:18px;
+      max-width:520px;
+      width:90%;
+      border:1px solid rgba(128,255,172,.35);
+      color:#f5f5f5;
+      font-size:0.9rem;
+      max-height:80vh;
+      overflow:auto;
+    }
+    #config-card h2 {
+      margin-top:0;
+      text-align:center;
+      color:#80ff9c;
+    }
+    #config-card label {
+      font-size:0.8rem;
+      display:block;
+      margin-top:10px;
+      margin-bottom:4px;
+    }
+    #config-card input,
+    #config-card select {
+      width:100%;
+      padding:6px 8px;
+      border-radius:6px;
+      border:1px solid #255739;
+      background:#020a06;
+      color:#fefefe;
+    }
+    .player-row {
+      display:flex;
+      gap:6px;
+      margin-top:6px;
+    }
+    .player-row input {
+      flex:2;
+    }
+    .player-row select {
+      flex:1;
+    }
+
+    @media (max-width: 900px) {
+      #game-root { flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+<div id="game-root">
+  <div id="left-panel">
+    <h1>Protege al Pato – Versión Web</h1>
+    <div id="top-bar">
+      <div>
+        <span class="tag tag-pato">PATO</span>
+        <span class="tag tag-animals">ANIMALES</span>
+        <span class="tag tag-robots">ROBOTS</span>
+      </div>
+      <div id="dice-panel">
+        <div id="dice-visual"></div>
+        <button id="btn-roll" disabled>Lanzar dado</button>
+        <button id="btn-end" disabled>Terminar turno</button>
+      </div>
+    </div>
+
+    <div id="canvas-wrapper">
+      <canvas id="gameCanvas"></canvas>
+      <div id="tooltip"></div>
+    </div>
+  </div>
+
+  <div id="right-panel">
+    <div id="info-turno">
+      <div><strong>Ronda:</strong> <span id="lbl-round">1</span> / 20</div>
+      <div><strong>Turno:</strong> <span id="lbl-faction">-</span></div>
+      <div><strong>Jugadores del bando:</strong> <span id="lbl-player">-</span></div>
+    </div>
+
+    <div id="info-unidad">
+      <h2>Unidad seleccionada</h2>
+      <div id="unit-name">Ninguna</div>
+      <div id="unit-type"></div>
+      <div class="hp-bar"><div class="hp-fill" style="width:0%"></div></div>
+      <div id="unit-stats"></div>
+      <div id="unit-ability" style="margin-top:6px; opacity:0.9;"></div>
+    </div>
+
+    <div id="log"></div>
+  </div>
+</div>
+
+<!-- Overlay de configuración 2–12 jugadores -->
+<div id="config-overlay">
+  <div id="config-card">
+    <h2>Nueva partida (2–12 jugadores)</h2>
+    <p style="opacity:.85;">
+      Todos juegan en la misma computadora. Cada jugador elige nombre y bando.
+      Los que sean <strong>Animales</strong> comparten el control de los
+      animales y el Pato. Los de <strong>Robots</strong> comparten el control de los robots.
+    </p>
+
+    <label for="numPlayers">Número de jugadores (2–12)</label>
+    <input id="numPlayers" type="number" min="2" max="12" value="2">
+
+    <button id="btn-gen" style="margin-top:8px; width:100%;">Generar jugadores</button>
+
+    <div id="playersContainer" style="margin-top:10px;"></div>
+
+    <button id="btn-start" style="margin-top:14px; width:100%;">Iniciar partida</button>
+  </div>
+</div>
+
+<script>
+/* ===========================
+   CONSTANTES Y ESTADO
+   =========================== */
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+/* Más casillas */
+const COLS = 12;
+const ROWS = 14;
+
+const TERRAIN = {
+  PLAIN: 'llano',
+  WATER: 'agua',
+  MOUNTAIN: 'montana',
+  FOREST: 'bosque'
+};
+
+const FACTION = {
+  PATO: 'pato',
+  ANIMALS: 'animales',
+  ROBOTS: 'robots'
+};
+
+const TURN_ORDER = [FACTION.PATO, FACTION.ROBOTS, FACTION.ANIMALS];
+
+let grid = [];
+let units = [];
+let round = 1;
+let turnIndex = 0;
+let currentFaction = TURN_ORDER[0];
+let selectedUnit = null;
+let reachableCells = [];
+let pendingTarget = null;
+let hasMovedThisTurn = false;
+let hasAttackedThisTurn = false;
+let gameOver = false;
+
+let animalsPlayers = [];
+let robotsPlayers = [];
+
+const lblRound = document.getElementById('lbl-round');
+const lblFaction = document.getElementById('lbl-faction');
+const lblPlayer = document.getElementById('lbl-player');
+const logDiv = document.getElementById('log');
+
+const btnRoll = document.getElementById('btn-roll');
+const btnEnd = document.getElementById('btn-end');
+
+const unitNameEl = document.getElementById('unit-name');
+const unitTypeEl = document.getElementById('unit-type');
+const unitStatsEl = document.getElementById('unit-stats');
+const unitAbilityEl = document.getElementById('unit-ability');
+const hpFillEl = document.querySelector('.hp-fill');
+
+const tooltip = document.getElementById('tooltip');
+
+/* ======== CARGA DE IMÁGENES ======== */
+
+const sprites = {};
+const spritePaths = {
+  mapa: 'assetsJUEGO/mapa.png',
+  pato: 'assetsJUEGO/patosinfondo.png',
+  robot_malo: 'assetsJUEGO/roibotMALOsinFondo.png',
+  robot_aliado: 'assetsJUEGO/robotamigoSINfondo.png',
+  zarigueya: 'assetsJUEGO/zariSinfondo.png',
+  alce: 'assetsJUEGO/alceSInfondo.png',
+  zorro: 'assetsJUEGO/zorroSINFONDO.png',
+  oso: 'assetsJUEGO/osoSinfondo.png'
+};
+
+for (const key in spritePaths) {
+  const img = new Image();
+  img.src = spritePaths[key];
+  sprites[key] = img;
+}
+
+/* =========== HEX LAYOUT (puntita arriba, alineado al tablero) =========== */
+
+let hex = {
+  r: 20,
+  w: 40,
+  h: 40,
+  boardW: 0,
+  boardH: 0,
+  offsetX: 0,
+  offsetY: 0
+};
+
+function computeHexLayout() {
+  const wCanvas = canvas.width;
+  const hCanvas = canvas.height;
+
+  // layout vertical "odd-q"
+  const boardWFactor = 2 + 1.5 * (COLS - 1);
+  const boardHFactor = Math.sqrt(3) * (ROWS + 0.5);
+
+  const rByWidth  = wCanvas / boardWFactor;
+  const rByHeight = hCanvas / boardHFactor;
+  const r = Math.min(rByWidth, rByHeight) * 0.95;
+
+  hex.r = r;
+  hex.w = 2 * r;
+  hex.h = Math.sqrt(3) * r;
+
+  hex.boardW = boardWFactor * r;
+  hex.boardH = boardHFactor * r;
+
+  hex.offsetX = (wCanvas - hex.boardW) / 2 + r;
+  hex.offsetY = (hCanvas - hex.boardH) / 2 + hex.h / 2;
+}
+
+// Centro del hex (col, row) usando vertical "odd-q"
+function hexCenter(col, row) {
+  const x = hex.offsetX + (1.5 * hex.r * col);
+  const y = hex.offsetY + hex.h * (row + (col & 1) * 0.5);
+  return { x, y };
+}
+
+// Hexágono punta arriba
+function drawHex(x, y, color, alpha=0.35) {
+  const r = hex.r;
+  const h = hex.h;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x,        y - h/2);   // arriba
+  ctx.lineTo(x + r,    y - h/4);   // arriba-derecha
+  ctx.lineTo(x + r,    y + h/4);   // abajo-derecha
+  ctx.lineTo(x,        y + h/2);   // abajo
+  ctx.lineTo(x - r,    y + h/4);   // abajo-izquierda
+  ctx.lineTo(x - r,    y - h/4);   // arriba-izquierda
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+/* =========== UTILIDADES =========== */
+
+function log(msg) {
+  const p = document.createElement('p');
+  p.textContent = msg;
+  logDiv.appendChild(p);
+  logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+function isInside(col, row) {
+  return col >= 0 && col < COLS && row >= 0 && row < ROWS;
+}
+
+function getUnitAt(col, row) {
+  return units.find(u => !u.dead && u.col === col && u.row === row);
+}
+
+/* Terreno aproximado basado en centro (agua en el centro, montañas esquinas) */
+function getTerrain(col, row) {
+  const cC = (COLS-1)/2;
+  const cR = (ROWS-1)/2;
+  const dx = (col - cC) / (COLS/4);
+  const dy = (row - cR) / (ROWS/4);
+  const distEllipse = dx*dx + dy*dy;
+
+  // lago central
+  if (distEllipse < 1.0) return TERRAIN.WATER;
+
+  // montañas arriba izq y abajo der
+  if ((col < 3 && row < 4) || (col > COLS-4 && row > ROWS-5)) {
+    return TERRAIN.MOUNTAIN;
+  }
+
+  // "bosques" arriba derecha e izquierda abajo
+  if ((col > COLS-4 && row < 5) || (col < 3 && row > ROWS-4)) {
+    return TERRAIN.FOREST;
+  }
+
+  return TERRAIN.PLAIN;
+}
+
+/* =========== CLASE UNIDAD =========== */
+
+class Unit {
+  constructor(opts) {
+    Object.assign(this, opts);
+    this.hp = this.maxHP;
+    this.dead = false;
+    this.hasDodged = false;
+    this.hasAttacked = false;
+    this.blockCooldown = 0;
+  }
+
+  movementPoints() {
+    const terrain = getTerrain(this.col, this.row);
+    if (this.type === 'pato') {
+      return terrain === TERRAIN.WATER ? 3 : 1;
+    }
+    if (this.faction === FACTION.ROBOTS) {
+      if (terrain === TERRAIN.MOUNTAIN) return 1;
+      return 2;
+    }
+    if (this.type === 'alce') return 3;
+    return 2;
+  }
+
+  damageFor(target, fromBehind) {
+    if (this.type === 'zorro') {
+      return fromBehind ? 2 : 1;
+    }
+    if (this.type === 'oso') return 2;
+    if (this.faction === FACTION.ROBOTS) return 1;
+    return 1;
+  }
+
+  // Frente lógico: robots hacia la derecha, animales y pato hacia la izquierda
+  frontDirection() {
+    return (this.faction === FACTION.ROBOTS) ? 1 : -1;
+  }
+
+  abilityText() {
+    switch (this.type) {
+      case 'pato':
+        return 'No puede atacar. Se mueve 3 casillas en agua y 1 en tierra. Si muere, ganan los robots.';
+      case 'zorro':
+        return 'Hace 1 de daño (2 si ataca por la espalda).';
+      case 'oso':
+        return 'Hace 2 puntos de daño en cada ataque acertado.';
+      case 'zarigueya':
+        return 'Esquiva el primer ataque que reciba mientras no haya atacado antes.';
+      case 'alce':
+        return 'Puede moverse hasta 3 casillas por turno.';
+      case 'robot_aliado':
+        return 'Bloquea un ataque cada cierto tiempo. Daño estándar (1). Está del lado de los animales.';
+      case 'robot_malo':
+        return 'Se mueve 2 casillas (1 en montaña). Daño 1.';
+      default:
+        return '';
+    }
+  }
+}
+
+/* =========== INICIALIZACIÓN =========== */
+
+function initGrid() {
+  grid = [];
+  for (let r = 0; r < ROWS; r++) {
+    const row = [];
+    for (let c = 0; c < COLS; c++) {
+      row.push(getTerrain(c, r));
+    }
+    grid.push(row);
+  }
+}
+
+/* Robots a la IZQUIERDA, Animales a la DERECHA, Pato en el centro (6 y 6) */
+function initUnits() {
+  units = [];
+  const centerC = Math.floor(COLS / 2);
+  const centerR = Math.floor(ROWS / 2);
+
+  // ===== PATO =====
+  units.push(new Unit({
+    id:'pato',
+    name:'Pato',
+    type:'pato',
+    faction:FACTION.PATO,
+    col:centerC,
+    row:centerR,
+    maxHP:1,
+    spriteKey:'pato'
+  }));
+
+  // ===== ANIMALES (5 unidades + pato = 6) lado derecho =====
+  units.push(new Unit({
+    id:'zorro',
+    name:'Zorro',
+    type:'zorro',
+    faction:FACTION.ANIMALS,
+    col:COLS-1, row:centerR-2,
+    maxHP:2,
+    spriteKey:'zorro'
+  }));
+  units.push(new Unit({
+    id:'oso',
+    name:'Oso',
+    type:'oso',
+    faction:FACTION.ANIMALS,
+    col:COLS-2, row:centerR,
+    maxHP:2,
+    spriteKey:'oso'
+  }));
+  units.push(new Unit({
+    id:'zarigueya',
+    name:'Zarigüeya',
+    type:'zarigueya',
+    faction:FACTION.ANIMALS,
+    col:COLS-1, row:centerR+2,
+    maxHP:2,
+    spriteKey:'zarigueya'
+  }));
+  units.push(new Unit({
+    id:'alce',
+    name:'Alce',
+    type:'alce',
+    faction:FACTION.ANIMALS,
+    col:COLS-2, row:centerR-4,
+    maxHP:2,
+    spriteKey:'alce'
+  }));
+  units.push(new Unit({
+    id:'robotAliado',
+    name:'Robot aliado',
+    type:'robot_aliado',
+    faction:FACTION.ANIMALS,
+    col:COLS-3, row:centerR+3,
+    maxHP:3,
+    spriteKey:'robot_aliado'
+  }));
+
+  // ===== ROBOTS MALOS (6 unidades) lado izquierdo =====
+  const r = centerR;
+  const robotPositions = [
+    { col: 0, row: r - 4 },
+    { col: 0, row: r - 1 },
+    { col: 0, row: r + 2 },
+    { col: 1, row: r - 3 },
+    { col: 1, row: r      },
+    { col: 1, row: r + 3 }
+  ];
+
+  robotPositions.forEach((pos, i) => {
+    units.push(new Unit({
+      id: 'robot' + (i + 1),
+      name: 'Robot',
+      type: 'robot_malo',
+      faction: FACTION.ROBOTS,
+      col: pos.col,
+      row: pos.row,
+      maxHP: 3,
+      spriteKey: 'robot_malo'
+    }));
+  });
+}
+
+/* =========== MOVIMIENTO (hex vecinos) =========== */
+
+// Vecinos para layout vertical "odd-q"
+function getNeighbors(col, row) {
+  const odd = col & 1;
+  const dirsOdd = [
+    { dc: +1, dr:  0 },
+    { dc:  0, dr: -1 },
+    { dc: -1, dr: -1 },
+    { dc: -1, dr:  0 },
+    { dc: -1, dr: +1 },
+    { dc:  0, dr: +1 }
+  ];
+  const dirsEven = [
+    { dc: +1, dr:  0 },
+    { dc: +1, dr: -1 },
+    { dc:  0, dr: -1 },
+    { dc: -1, dr:  0 },
+    { dc:  0, dr: +1 },
+    { dc: +1, dr: +1 }
+  ];
+  const dirs = odd ? dirsOdd : dirsEven;
+  const neighbors = [];
+
+  for (const d of dirs) {
+    const nc = col + d.dc;
+    const nr = row + d.dr;
+    if (isInside(nc, nr)) neighbors.push({ col: nc, row: nr });
+  }
+  return neighbors;
+}
+
+function bfsReachable(unit) {
+  const maxCost = unit.movementPoints();
+  const visited = {};
+  const result = [];
+  const q = [{col:unit.col,row:unit.row,cost:0}];
+
+  function key(c,r){return c+','+r;}
+  visited[key(unit.col,unit.row)] = 0;
+
+  while (q.length) {
+    const cur = q.shift();
+    for (const n of getNeighbors(cur.col,cur.row)) {
+      let stepCost = 1;
+      const terrain = getTerrain(n.col,n.row);
+      if (unit.faction === FACTION.ROBOTS && terrain === TERRAIN.MOUNTAIN) {
+        stepCost = 2;
+      }
+      const newCost = cur.cost + stepCost;
+      if (newCost > maxCost) continue;
+      const k = key(n.col,n.row);
+      if (visited[k] !== undefined && visited[k] <= newCost) continue;
+
+      const occ = getUnitAt(n.col,n.row);
+      if (occ && !(n.col===unit.col && n.row===unit.row)) continue;
+
+      visited[k] = newCost;
+      if (!(n.col===unit.col && n.row===unit.row)) result.push({col:n.col,row:n.row});
+      q.push({col:n.col,row:n.row,cost:newCost});
+    }
+  }
+  return result;
+}
+
+function enemyInFront(unit) {
+  // El pato nunca ataca
+  if (unit.faction === FACTION.PATO) return null;
+
+  const neighbors = getNeighbors(unit.col, unit.row);
+
+  function esEnemigo(target) {
+    if (!target) return false;
+    // Animales no atacan al pato
+    if (unit.faction === FACTION.ANIMALS && target.faction === FACTION.PATO) return false;
+    // No puede atacar aliados (salvo el pato que es neutral para robots)
+    if (unit.faction === target.faction && target.faction !== FACTION.PATO) return false;
+    return true;
+  }
+
+  const dir = unit.frontDirection(); // +1 robots, -1 animales
+
+  let candidato = null;
+
+  for (const n of neighbors) {
+    const target = getUnitAt(n.col, n.row);
+    if (!esEnemigo(target)) continue;
+
+    const dc = n.col - unit.col;
+
+    // Enemigo exactamente en la dirección frontal (columna hacia donde mira)
+    if (dc === dir) {
+      return target;
+    }
+
+    // Si no encontramos justo al frente, nos guardamos cualquiera adyacente
+    if (!candidato) {
+      candidato = target;
+    }
+  }
+
+  return candidato;
+}
+
+
+function attackedFromBehind(attacker, target) {
+  const frontDir = target.frontDirection();
+  const behindCol = target.col - frontDir;
+  const behindRow = target.row;
+  return attacker.col === behindCol && attacker.row === behindRow;
+}
+
+/* =========== DIBUJO =========== */
+
+function drawBoard() {
+  const mapImg = sprites.mapa;
+  if (mapImg && mapImg.complete && mapImg.naturalWidth>0) {
+    ctx.drawImage(mapImg, 0, 0, canvas.width, canvas.height);
+  } else {
+    ctx.fillStyle = '#145b33';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+  }
+
+  // hex de movimiento
+  reachableCells.forEach(c=>{
+    const {x,y} = hexCenter(c.col,c.row);
+    drawHex(x,y,'#fff176',0.35);
+  });
+
+  // unidades
+  for (const u of units) {
+    if (u.dead) continue;
+    const {x,y} = hexCenter(u.col,u.row);
+    const size = hex.r * 1.4;
+
+    // sombra
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x,y,size*0.55,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,0.35)';
+    ctx.fill();
+    ctx.restore();
+
+    const img = sprites[u.spriteKey];
+    if (img && img.complete && img.naturalWidth>0) {
+      const aspect = img.width/img.height;
+      let w = size, h = size;
+      if (aspect>1) h = size/aspect; else w = size*aspect;
+      ctx.drawImage(img, x-w/2, y-h/2, w, h);
+    } else {
+      ctx.fillStyle='#fff';
+      ctx.beginPath();
+      ctx.arc(x,y,size*0.45,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    // selección
+    if (selectedUnit && selectedUnit.id === u.id) {
+      ctx.strokeStyle='#ffe66d';
+      ctx.lineWidth=3;
+      ctx.beginPath();
+      ctx.arc(x,y,size*0.7,0,Math.PI*2);
+      ctx.stroke();
+    }
+
+    // HP
+    ctx.fillStyle='black';
+    ctx.font=`${Math.floor(hex.r*0.7)}px Arial`;
+    ctx.textAlign='center';
+    ctx.textBaseline='bottom';
+    ctx.fillText('♥'+u.hp, x, y+size*0.7);
+  }
+}
+
+/* =========== HUD =========== */
+
+function updateHUD() {
+  lblRound.textContent = round;
+  lblFaction.textContent =
+    currentFaction === FACTION.PATO ? 'Pato' :
+    currentFaction === FACTION.ANIMALS ? 'Animales' : 'Robots';
+
+  const names =
+    currentFaction === FACTION.ROBOTS ? robotsPlayers : animalsPlayers;
+  lblPlayer.textContent = names.length ? names.join(', ') : '—';
+
+  updateSelectedInfo();
+}
+
+function updateSelectedInfo() {
+  if (!selectedUnit) {
+    unitNameEl.textContent='Ninguna';
+    unitTypeEl.textContent='';
+    hpFillEl.style.width='0%';
+    unitStatsEl.textContent='';
+    unitAbilityEl.textContent='';
+    return;
+  }
+  unitNameEl.textContent = selectedUnit.name;
+  const fac =
+    selectedUnit.faction === FACTION.PATO ? 'Pato' :
+    selectedUnit.faction === FACTION.ANIMALS ? 'Animales' : 'Robots';
+  unitTypeEl.textContent = `${fac} · Vida: ${selectedUnit.hp}/${selectedUnit.maxHP}`;
+  hpFillEl.style.width = (selectedUnit.hp/selectedUnit.maxHP*100)+'%';
+  const mov = selectedUnit.movementPoints();
+  unitStatsEl.textContent = `Movimiento máximo este turno: ${mov} casillas.`;
+  unitAbilityEl.textContent = selectedUnit.abilityText();
+}
+
+/* =========== TURNOS / VICTORIA =========== */
+
+function startTurn() {
+  if (gameOver) return;
+  currentFaction = TURN_ORDER[turnIndex];
+  reachableCells = [];
+  pendingTarget = null;
+  hasMovedThisTurn = false;
+  hasAttackedThisTurn = false;
+  selectedUnit = null;
+  btnRoll.disabled = true;
+  btnEnd.disabled = false;
+  updateHUD();
+  drawBoard();
+}
+
+function endTurn() {
+  if (gameOver) return;
+  for (const u of units) {
+    if (u.type === 'robot_aliado' && u.blockCooldown>0) u.blockCooldown--;
+  }
+  turnIndex++;
+  if (turnIndex >= TURN_ORDER.length) {
+    turnIndex = 0;
+    round++;
+    if (round > 20) {
+      const pato = units.find(u=>u.id==='pato');
+      if (pato && !pato.dead) {
+        endGame(FACTION.ANIMALS,'El pato sobrevivió hasta la ronda 20.');
+        return;
+      }
+    }
+  }
+  startTurn();
+}
+
+function endGame(winner, reason) {
+  gameOver = true;
+  btnEnd.disabled = true;
+  btnRoll.disabled = true;
+  log('— — — — —');
+  log('Fin de la partida: '+reason);
+  const winners =
+    winner===FACTION.ROBOTS ? robotsPlayers : animalsPlayers;
+  log('Ganadores: '+(winners.length?winners.join(', '):'Bando ganador'));
+  alert('Fin del juego: '+reason+'\nGanadores: '+(winners.length?winners.join(', '):'Bando ganador'));
+}
+
+/* =========== ATAQUE =========== */
+
+function applyDamage(attacker, target) {
+  if (target.type === 'zarigueya' && !target.hasAttacked && !target.hasDodged) {
+    log('La Zarigüeya esquiva el ataque gracias a su habilidad.');
+    target.hasDodged = true;
+    return;
+  }
+  if (target.type === 'robot_aliado' && target.blockCooldown === 0) {
+    log('El Robot aliado bloquea el ataque.');
+    target.blockCooldown = 3;
+    return;
+  }
+  const behind = attackedFromBehind(attacker,target);
+  const dmg = attacker.damageFor(target,behind);
+  target.hp -= dmg;
+  log(`${attacker.name} hace ${dmg} de daño a ${target.name}.`);
+  if (target.hp <= 0) {
+    target.dead = true;
+    log(`${target.name} ha sido eliminado.`);
+    if (target.id === 'pato') {
+      endGame(FACTION.ROBOTS,'Los robots eliminaron al pato.');
+    }
+  }
+}
+
+/* =========== CLICK / MOUSE EN HEX =========== */
+
+canvas.addEventListener('click', e => {
+  if (gameOver) return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width/rect.width;
+  const scaleY = canvas.height/rect.height;
+  const x = (e.clientX-rect.left)*scaleX;
+  const y = (e.clientY-rect.top)*scaleY;
+
+  // buscamos el hex más cercano
+  let best = null;
+  let bestDist = Infinity;
+  for (let r=0;r<ROWS;r++){
+    for (let c=0;c<COLS;c++){
+      const {x:cx,y:cy} = hexCenter(c,r);
+      const d2 = (cx-x)**2 + (cy-y)**2;
+      if (d2 < bestDist) {
+        bestDist = d2;
+        best = {col:c,row:r};
+      }
+    }
+  }
+  if (!best) return;
+  const col = best.col;
+  const row = best.row;
+  const u = getUnitAt(col,row);
+
+  // Mover a una casilla alcanzable
+  if (selectedUnit &&
+      reachableCells.some(c=>c.col===col && c.row===row) &&
+      !getUnitAt(col,row)) {
+    selectedUnit.col = col;
+    selectedUnit.row = row;
+    hasMovedThisTurn = true;
+    reachableCells = [];
+    drawBoard();
+    const enemy = enemyInFront(selectedUnit);
+    if (enemy && !hasAttackedThisTurn && selectedUnit.faction!==FACTION.PATO) {
+      pendingTarget = enemy;
+      btnRoll.disabled = false;
+      log(`${selectedUnit.name} tiene a ${enemy.name} al frente. Puedes atacar.`);
+    } else {
+      pendingTarget = null;
+      btnRoll.disabled = true;
+    }
+    return;
+  }
+
+  // Seleccionar unidad según el turno
+  if (u && !u.dead) {
+    if (currentFaction === FACTION.PATO && u.id !== 'pato') return;
+    if (currentFaction === FACTION.ANIMALS && u.faction !== FACTION.ANIMALS) return;
+    if (currentFaction === FACTION.ROBOTS && u.faction !== FACTION.ROBOTS) return;
+
+    selectedUnit = u;
+    reachableCells = hasMovedThisTurn ? [] : bfsReachable(u);
+    const enemy = enemyInFront(u);
+    pendingTarget = (enemy && !hasAttackedThisTurn && u.faction!==FACTION.PATO) ? enemy:null;
+    btnRoll.disabled = !pendingTarget;
+    updateSelectedInfo();
+    drawBoard();
+    log(`Seleccionaste a ${u.name}.`);
+  }
+});
+
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width/rect.width;
+  const scaleY = canvas.height/rect.height;
+  const x = (e.clientX-rect.left)*scaleX;
+  const y = (e.clientY-rect.top)*scaleY;
+
+  let best = null;
+  let bestDist = Infinity;
+  for (let r=0;r<ROWS;r++){
+    for (let c=0;c<COLS;c++){
+      const {x:cx,y:cy} = hexCenter(c,r);
+      const d2 = (cx-x)**2 + (cy-y)**2;
+      if (d2 < bestDist) {
+        bestDist = d2;
+        best = {col:c,row:r};
+      }
+    }
+  }
+  if (!best) {
+    tooltip.style.display='none';
+    return;
+  }
+  const col = best.col;
+  const row = best.row;
+  const terrain = getTerrain(col,row);
+  const u = getUnitAt(col,row);
+  let text = `Terreno: ${terrain}`;
+  if (u && !u.dead) text += ` | ${u.name} (HP ${u.hp}/${u.maxHP})`;
+  tooltip.textContent = text;
+  tooltip.style.display='block';
+  tooltip.style.left = (e.clientX+10)+'px';
+  tooltip.style.top  = (e.clientY+10)+'px';
+});
+
+canvas.addEventListener('mouseleave', ()=>{
+  tooltip.style.display='none';
+});
+
+/* =========== DADO VISUAL =========== */
+
+const diceDiv = document.getElementById('dice-visual');
+function drawDice(value) {
+  diceDiv.innerHTML='';
+  if (!value) return;
+  const positions = {
+    1:[5],
+    2:[1,9],
+    3:[1,5,9],
+    4:[1,3,7,9],
+    5:[1,3,5,7,9],
+    6:[1,3,4,6,7,9]
+  }[value] || [];
+  positions.forEach(pos=>{
+    const pip=document.createElement('div');
+    pip.className='pip';
+    const r=Math.floor((pos-1)/3);
+    const c=(pos-1)%3;
+    pip.style.left=(6+c*11)+'px';
+    pip.style.top =(6+r*11)+'px';
+    diceDiv.appendChild(pip);
+  });
+}
+
+btnRoll.addEventListener('click', ()=>{
+  if (!selectedUnit || !pendingTarget || gameOver) return;
+  btnRoll.disabled=true;
+  let frames=10;
+  const anim=setInterval(()=>{
+    const v=Math.floor(Math.random()*6)+1;
+    drawDice(v);
+    frames--;
+    if (frames<=0){
+      clearInterval(anim);
+      const finalVal=Math.floor(Math.random()*6)+1;
+      drawDice(finalVal);
+      log(`Se lanzó el dado y salió ${finalVal}.`);
+      if (finalVal>=4){
+        log('Ataque exitoso.');
+        applyDamage(selectedUnit,pendingTarget);
+      }else{
+        log('Ataque fallido.');
+      }
+      hasAttackedThisTurn=true;
+      pendingTarget=null;
+      drawBoard();
+    }
+  },50);
+});
+
+btnEnd.addEventListener('click', ()=>{
+  if (!gameOver) endTurn();
+});
+
+/* =========== CONFIG JUGADORES 2–12 =========== */
+
+const numPlayersInput = document.getElementById('numPlayers');
+const btnGen = document.getElementById('btn-gen');
+const playersContainer = document.getElementById('playersContainer');
+const btnStart = document.getElementById('btn-start');
+const overlay = document.getElementById('config-overlay');
+
+btnGen.addEventListener('click', ()=>{
+  let n = parseInt(numPlayersInput.value,10);
+  if (isNaN(n) || n<2) n=2;
+  if (n>12) n=12;
+  numPlayersInput.value = n;
+  playersContainer.innerHTML='';
+  for (let i=0;i<n;i++){
+    const row = document.createElement('div');
+    row.className='player-row';
+    const inp = document.createElement('input');
+    inp.placeholder='Jugador '+(i+1);
+    inp.id='playerName_'+i;
+    const sel = document.createElement('select');
+    sel.id='playerSide_'+i;
+    const optA=document.createElement('option');
+    optA.value='animales';
+    optA.textContent='Animales + Pato';
+    const optR=document.createElement('option');
+    optR.value='robots';
+    optR.textContent='Robots';
+    sel.appendChild(optA);
+    sel.appendChild(optR);
+    if (n===2){
+      sel.value = i===0 ? 'robots' : 'animales';
+    }
+    row.appendChild(inp);
+    row.appendChild(sel);
+    playersContainer.appendChild(row);
+  }
+});
+
+btnStart.addEventListener('click', ()=>{
+  animalsPlayers = [];
+  robotsPlayers = [];
+  const rows = playersContainer.querySelectorAll('.player-row');
+  if (rows.length===0){
+    alert('Primero genera los jugadores.');
+    return;
+  }
+  rows.forEach((row,idx)=>{
+    const name = (document.getElementById('playerName_'+idx).value || ('Jugador '+(idx+1))).trim();
+    const side = document.getElementById('playerSide_'+idx).value;
+    if (side==='animales') animalsPlayers.push(name);
+    else robotsPlayers.push(name);
+  });
+  if (!animalsPlayers.length || !robotsPlayers.length){
+    alert('Debe haber al menos un jugador de Animales y uno de Robots.');
+    return;
+  }
+  overlay.style.display='none';
+  startGame();
+});
+
+function startGame() {
+  initGrid();
+  initUnits();
+  round=1;
+  turnIndex=0;
+  currentFaction=TURN_ORDER[0];
+  gameOver=false;
+  logDiv.innerHTML='';
+  log('Comienza la partida. Objetivo Robots: eliminar al pato. Objetivo Animales: mantenerlo vivo 20 rondas.');
+  resizeCanvas();
+  startTurn();
+}
+
+/* =========== RESPONSIVE =========== */
+
+function resizeCanvas() {
+  const wrapper = document.getElementById('canvas-wrapper');
+  const w = wrapper.clientWidth;
+  const h = wrapper.clientWidth * 1.4; // más alto
+  canvas.width = w;
+  canvas.height = h;
+  computeHexLayout();
+  drawBoard();
+}
+
+window.addEventListener('resize', resizeCanvas);
+sprites.mapa.onload = resizeCanvas;
+</script>
+</body>
+</html>
