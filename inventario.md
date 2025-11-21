@@ -28,6 +28,7 @@ Inventario de actividades:
 - Revisión visual general del juego.  
 - Pruebas de funcionamiento y corrección de errores.
 - ⁠Apoyo en programación.
+- ⁠Agrengando el juego al Pages
 
 # Federico Marquez Martinez 
 
