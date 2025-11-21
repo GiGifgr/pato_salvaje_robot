@@ -52,3 +52,5 @@ Si un jugador está frente a su contrincante lanza un dado de 6 caras. Un result
 ![tablero](assests/defTABLERO.png)
 ![personajes](assests/cartasPAto1.png)
 ![personajes](assests/cartasPato2.png)
+
+[Pagina](https://gigifgr.github.io/pato_salvaje_robot/)
