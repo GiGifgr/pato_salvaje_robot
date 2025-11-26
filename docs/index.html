@@ -1,322 +1,527 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Protege al Pato - Juego</title>
-  <style>
-    * { box-sizing: border-box; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protege al Pato - Sitio Oficial</title>
 
-    body {
-      margin: 0;
-      font-family: system-ui, Arial, sans-serif;
-      background: #0b2413;
-      color: #f5f5f5;
-    }
+    <style>
+        /* ====== ESTILOS DEL SITIO ====== */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f2f2f2;
+            color: #222;
+        }
 
-    #game-root {
-      max-width: 1400px;
-      margin: 0 auto;
-      min-height: 100vh;
-      display: flex;
-      gap: 16px;
-      padding: 16px;
-    }
+        header {
+            background: #40c518;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
 
-    #left-panel {
-      flex: 3;
-      background: #082010;
-      border-radius: 12px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+        nav {
+            background: #10610b;
+            padding: 12px;
+            text-align: center;
+        }
 
-    #right-panel {
-      flex: 2;
-      background: #08130b;
-      border-radius: 12px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 1.4rem;
-      text-align: center;
-      color: #80ff9c;
-    }
+        section {
+            padding: 40px;
+            background: white;
+            margin: 20px auto;
+            max-width: 1100px;
+            border-radius: 10px;
+        }
 
-    #top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.9rem;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+        h2 {
+            color: #004900;
+        }
 
-    .tag {
-      padding: 3px 7px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .03em;
-    }
-    .tag-pato { background:#ffe66d; color:#333; }
-    .tag-animals { background:#32c96b; }
-    .tag-robots { background:#ff5e5e; }
+       .juego {
+    width: 100%;
+    min-height: 500px;
+    background: #ddf3e5;
+    border: 2px dashed #00ffa6;
+    border-radius: 10px;
+    padding: 16px;
+    box-sizing: border-box;
+    position: relative;   /* 👈 AÑADE ESTO */
+}
 
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: #23c36b;
-      color: #02100a;
-      transition: transform .08s ease, box-shadow .08s ease, background .15s;
-      box-shadow: 0 0 0 rgba(0,0,0,0);
-    }
-    button:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0,0,0,.4);
-      background:#33d47c;
-    }
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      box-shadow:none;
-    }
 
-    #canvas-wrapper {
-      position: relative;
-      flex: 1;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 2px solid #235b37;
-      background:#0a2b16;
-    }
+        .personajes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
 
-    #gameCanvas {
-      width: 100%;
-      display:block;
-      background:#000;
-    }
+        .personajes img {
+            width: 180px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
 
-    #tooltip {
-      position:absolute;
-      pointer-events:none;
-      background: rgba(10,20,10,.92);
-      border-radius:8px;
-      padding:6px 8px;
-      font-size:0.75rem;
-      border:1px solid rgba(128,255,172,.3);
-      display:none;
-      z-index:5;
-      white-space:nowrap;
-    }
+        .mapa {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
 
-    #dice-panel {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      justify-content:flex-end;
-    }
+        @media (max-width: 700px) {
+            .personajes img { width: 100%; max-width: 250px; }
+        }
 
-    #dice-visual {
-      width:34px;
-      height:34px;
-      border-radius:8px;
-      border:2px solid #36d47d;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#02150b;
-      position:relative;
-    }
-    .pip {
-      width:5px;
-      height:5px;
-      border-radius:50%;
-      background:#36d47d;
-      position:absolute;
-    }
+        /* ====== ESTILOS DEL JUEGO (ADAPTADOS) ====== */
 
-    #info-turno {
-      background:#07140c;
-      border-radius:10px;
-      padding:8px 10px;
-      font-size:0.82rem;
-      border:1px solid rgba(128,255,172,.25);
-    }
+        * { box-sizing: border-box; }
 
-    #info-unidad {
-      background:#07140c;
-      border-radius:10px;
-      padding:10px;
-      border:1px solid rgba(128,255,172,.25);
-      font-size:0.84rem;
-    }
+        /* Ya no tocamos el body, sólo el contenedor del juego */
+        #game-root {
+            max-width: 100%;
+            margin: 0;
+            min-height: 0;
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: #0b2413;
+            color: #f5f5f5;
+            border-radius: 10px;
+        }
 
-    #info-unidad h2 {
-      margin:0 0 6px;
-      font-size:1rem;
-      color:#80ff9c;
-    }
+        #left-panel {
+            flex: 3;
+            background: #082010;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-    .hp-bar {
-      height:8px;
-      border-radius:999px;
-      background:#28352f;
-      overflow:hidden;
-      margin:4px 0 8px;
-    }
-    .hp-fill {
-      height:100%;
-      background:linear-gradient(90deg,#ff6b6b,#ffd166);
-    }
+        #right-panel {
+            flex: 2;
+            background: #08130b;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-    #log {
-      flex:1;
-      background:#020806;
-      border-radius:10px;
-      padding:8px;
-      border:1px solid rgba(128,255,172,.2);
-      font-size:0.78rem;
-      overflow-y:auto;
-    }
-    #log p {
-      margin:2px 0;
-    }
+        h1 {
+            margin: 0 0 8px;
+            font-size: 1.4rem;
+            text-align: center;
+            color: #80ff9c;
+        }
 
-    /* Overlay de configuración con 2–12 jugadores */
-    #config-overlay {
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.75);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:20;
-    }
-    #config-card {
-      background:#04130a;
-      border-radius:14px;
-      padding:18px;
-      max-width:520px;
-      width:90%;
-      border:1px solid rgba(128,255,172,.35);
-      color:#f5f5f5;
-      font-size:0.9rem;
-      max-height:80vh;
-      overflow:auto;
-    }
-    #config-card h2 {
-      margin-top:0;
-      text-align:center;
-      color:#80ff9c;
-    }
-    #config-card label {
-      font-size:0.8rem;
-      display:block;
-      margin-top:10px;
-      margin-bottom:4px;
-    }
-    #config-card input,
-    #config-card select {
-      width:100%;
-      padding:6px 8px;
-      border-radius:6px;
-      border:1px solid #255739;
-      background:#020a06;
-      color:#fefefe;
-    }
-    .player-row {
-      display:flex;
-      gap:6px;
-      margin-top:6px;
-    }
-    .player-row input {
-      flex:2;
-    }
-    .player-row select {
-      flex:1;
-    }
+        #top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
 
-    @media (max-width: 900px) {
-      #game-root { flex-direction:column; }
-    }
-  </style>
+        .tag {
+            padding: 3px 7px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+        }
+        .tag-pato { background:#ffe66d; color:#333; }
+        .tag-animals { background:#32c96b; }
+        .tag-robots { background:#ff5e5e; }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: #23c36b;
+            color: #02100a;
+            transition: transform .08s ease, box-shadow .08s ease, background .15s;
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,.4);
+            background:#33d47c;
+        }
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            box-shadow:none;
+        }
+
+        #canvas-wrapper {
+            position: relative;
+            flex: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #235b37;
+            background:#0a2b16;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            display:block;
+            background:#000;
+        }
+
+        #tooltip {
+            position:absolute;
+            pointer-events:none;
+            background: rgba(10,20,10,.92);
+            border-radius:8px;
+            padding:6px 8px;
+            font-size:0.75rem;
+            border:1px solid rgba(128,255,172,.3);
+            display:none;
+            z-index:5;
+            white-space:nowrap;
+        }
+
+        #dice-panel {
+            display:flex;
+            align-items:center;
+            gap:10px;
+            justify-content:flex-end;
+        }
+
+        #dice-visual {
+            width:34px;
+            height:34px;
+            border-radius:8px;
+            border:2px solid #36d47d;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#02150b;
+            position:relative;
+        }
+        .pip {
+            width:5px;
+            height:5px;
+            border-radius:50%;
+            background:#36d47d;
+            position:absolute;
+        }
+
+        #info-turno {
+            background:#07140c;
+            border-radius:10px;
+            padding:8px 10px;
+            font-size:0.82rem;
+            border:1px solid rgba(128,255,172,.25);
+        }
+
+        #info-unidad {
+            background:#07140c;
+            border-radius:10px;
+            padding:10px;
+            border:1px solid rgba(128,255,172,.25);
+            font-size:0.84rem;
+        }
+
+        #info-unidad h2 {
+            margin:0 0 6px;
+            font-size:1rem;
+            color:#80ff9c;
+        }
+
+        .hp-bar {
+            height:8px;
+            border-radius:999px;
+            background:#28352f;
+            overflow:hidden;
+            margin:4px 0 8px;
+        }
+        .hp-fill {
+            height:100%;
+            background:linear-gradient(90deg,#ff6b6b,#ffd166);
+        }
+
+        #log {
+            flex:1;
+            background:#020806;
+            border-radius:10px;
+            padding:8px;
+            border:1px solid rgba(128,255,172,.2);
+            font-size:0.78rem;
+            overflow-y:auto;
+        }
+        #log p {
+            margin:2px 0;
+        }
+
+     #config-overlay {
+    position:absolute;          /* 👈 ya no fixed */
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;               /* solo dentro de .juego */
+    background:rgba(0,0,0,.75);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:20;
+}
+        #config-card {
+            background:#04130a;
+            border-radius:14px;
+            padding:18px;
+            max-width:520px;
+            width:90%;
+            border:1px solid rgba(128,255,172,.35);
+            color:#f5f5f5;
+            font-size:0.9rem;
+            max-height:80vh;
+            overflow:auto;
+        }
+        #config-card h2 {
+            margin-top:0;
+            text-align:center;
+            color:#80ff9c;
+        }
+        #config-card label {
+            font-size:0.8rem;
+            display:block;
+            margin-top:10px;
+            margin-bottom:4px;
+        }
+        #config-card input,
+        #config-card select {
+            width:100%;
+            padding:6px 8px;
+            border-radius:6px;
+            border:1px solid #255739;
+            background:#020a06;
+            color:#fefefe;
+        }
+        .player-row {
+            display:flex;
+            gap:6px;
+            margin-top:6px;
+        }
+        .player-row input {
+            flex:2;
+        }
+        .player-row select {
+            flex:1;
+        }
+
+        @media (max-width: 900px) {
+            #game-root { flex-direction:column; }
+        }
+    </style>
 </head>
+
 <body>
-<div id="game-root">
-  <div id="left-panel">
-    <h1>Protege al Pato – Versión Web</h1>
-    <div id="top-bar">
-      <div>
-        <span class="tag tag-pato">PATO</span>
-        <span class="tag tag-animals">ANIMALES</span>
-        <span class="tag tag-robots">ROBOTS</span>
-      </div>
-      <div id="dice-panel">
-        <div id="dice-visual"></div>
-        <button id="btn-roll" disabled>Lanzar dado</button>
-        <button id="btn-end" disabled>Terminar turno</button>
-      </div>
+
+<header>
+    <h1>Protege al Pato</h1>
+</header>
+
+<nav>
+    <a href="#inicio">Inicio</a>
+    <a href="#historia">Historia</a>
+    <a href="#mecanicas">Mecánicas</a>
+    <a href="#acerca">Acerca</a>
+</nav>
+
+<!-- ===========================
+            INICIO
+=========================== -->
+<section id="inicio">
+    <h2>Inicio</h2>
+    <p>A continuación se muestra el videojuego final del proyecto.</p>
+
+    <div class="juego">
+        <!-- AQUÍ VA AHORA EL JUEGO WEB -->
+        <div id="game-root">
+          <div id="left-panel">
+            <h1>Protege al Pato – Versión Web</h1>
+            <div id="top-bar">
+              <div>
+                <span class="tag tag-pato">PATO</span>
+                <span class="tag tag-animals">ANIMALES</span>
+                <span class="tag tag-robots">ROBOTS</span>
+              </div>
+              <div id="dice-panel">
+                <div id="dice-visual"></div>
+                <button id="btn-roll" disabled>Lanzar dado</button>
+                <button id="btn-end" disabled>Terminar turno</button>
+              </div>
+            </div>
+
+            <div id="canvas-wrapper">
+              <canvas id="gameCanvas"></canvas>
+              <div id="tooltip"></div>
+            </div>
+          </div>
+
+          <div id="right-panel">
+            <div id="info-turno">
+              <div><strong>Ronda:</strong> <span id="lbl-round">1</span> / 20</div>
+              <div><strong>Turno:</strong> <span id="lbl-faction">-</span></div>
+              <div><strong>Jugadores del bando:</strong> <span id="lbl-player">-</span></div>
+            </div>
+
+            <div id="info-unidad">
+              <h2>Unidad seleccionada</h2>
+              <div id="unit-name">Ninguna</div>
+              <div id="unit-type"></div>
+              <div class="hp-bar"><div class="hp-fill" style="width:0%"></div></div>
+              <div id="unit-stats"></div>
+              <div id="unit-ability" style="margin-top:6px; opacity:0.9;"></div>
+            </div>
+
+            <div id="log"></div>
+          </div>
+        </div>
+
+        <!-- Overlay de configuración 2–12 jugadores -->
+        <div id="config-overlay">
+          <div id="config-card">
+            <h2>Nueva partida (2–12 jugadores)</h2>
+            <p style="opacity:.85;">
+              Todos juegan en la misma computadora. Cada jugador elige nombre y bando.
+              Los que sean <strong>Animales</strong> comparten el control de los
+              animales y el Pato. Los de <strong>Robots</strong> comparten el control de los robots.
+            </p>
+
+            <label for="numPlayers">Número de jugadores (2–12)</label>
+            <input id="numPlayers" type="number" min="2" max="12" value="2">
+
+            <button id="btn-gen" style="margin-top:8px; width:100%;">Generar jugadores</button>
+
+            <div id="playersContainer" style="margin-top:10px;"></div>
+
+            <button id="btn-start" style="margin-top:14px; width:100%;">Iniciar partida</button>
+          </div>
+        </div>
     </div>
+</section>
 
-    <div id="canvas-wrapper">
-      <canvas id="gameCanvas"></canvas>
-      <div id="tooltip"></div>
-    </div>
-  </div>
+<!-- ===========================
+            HISTORIA
+=========================== -->
+<section id="historia">
+    <h2>Historia</h2>
 
-  <div id="right-panel">
-    <div id="info-turno">
-      <div><strong>Ronda:</strong> <span id="lbl-round">1</span> / 20</div>
-      <div><strong>Turno:</strong> <span id="lbl-faction">-</span></div>
-      <div><strong>Jugadores del bando:</strong> <span id="lbl-player">-</span></div>
-    </div>
-
-    <div id="info-unidad">
-      <h2>Unidad seleccionada</h2>
-      <div id="unit-name">Ninguna</div>
-      <div id="unit-type"></div>
-      <div class="hp-bar"><div class="hp-fill" style="width:0%"></div></div>
-      <div id="unit-stats"></div>
-      <div id="unit-ability" style="margin-top:6px; opacity:0.9;"></div>
-    </div>
-
-    <div id="log"></div>
-  </div>
-</div>
-
-<!-- Overlay de configuración 2–12 jugadores -->
-<div id="config-overlay">
-  <div id="config-card">
-    <h2>Nueva partida (2–12 jugadores)</h2>
-    <p style="opacity:.85;">
-      Todos juegan en la misma computadora. Cada jugador elige nombre y bando.
-      Los que sean <strong>Animales</strong> comparten el control de los
-      animales y el Pato. Los de <strong>Robots</strong> comparten el control de los robots.
+    <p>
+        En una isla remota un nuevo peligro emerge cuando un grupo de robots
+         desorientados llega tras un naufragio masivo, muy parecido al accidente
+          que originó a Roz en Robot Salvaje. Estos robots, programados para 
+          sobrevivir a toda costa, detectan en el pequeño Pato una fuente 
+          biológica que consideran esencial para reactivar sus sistemas dañados.
+           Al notar esta amenaza, los animales de la isla
+           se unen para proteger al Pato, pues representa no solo una vida 
+           inocente, sino un símbolo del delicado equilibrio de la isla. 
+           Entre ellos está también un robot aliado, uno que, al igual que Roz,
+            desarrolla conciencia y decide proteger la vida en lugar de destruirla
+            . Ahora, animales y un robot arrepentido deben colaborar para impedir
+             que la oleada mecánica capture al Pato antes del turno 20 y 
+             desequilibre para siempre la paz del ecosistema.
     </p>
 
-    <label for="numPlayers">Número de jugadores (2–12)</label>
-    <input id="numPlayers" type="number" min="2" max="12" value="2">
+    <h3>Mapa de la Isla</h3>
+    <img class="mapa" src="assetsJUEGO/mapa.png" alt="Mapa del juego">
+</section>
 
-    <button id="btn-gen" style="margin-top:8px; width:100%;">Generar jugadores</button>
+<!-- ===========================
+            MECÁNICAS
+=========================== -->
+<section id="mecanicas">
+    <h2>Mecánicas del Juego</h2>
 
-    <div id="playersContainer" style="margin-top:10px;"></div>
+    <h3>Personajes y habilidades</h3>
 
-    <button id="btn-start" style="margin-top:14px; width:100%;">Iniciar partida</button>
-  </div>
-</div>
+    <div class="personajes">
+      <img src="assetsJUEGO/tarjetas.png" style="width: 100%; max-width: 900px;">
+    </div>
+
+    <h3>Movimientos</h3>
+    <ul>
+        <li><strong>Robots:</strong> 2 casillas (1 en montaña).</li>
+        <li><strong>Animales:</strong> 2 casillas (Alce: 3 casillas).</li>
+        <li><strong>Pato:</strong> 3 en agua, 1 en tierra.</li>
+    </ul>
+
+    <h3>Ataque</h3>
+    <p>Solo si el enemigo está al frente y adyacente.</p>
+    <p>Dado de 6 caras:</p>
+    <ul>
+        <li>4–6 → éxito</li>
+        <li>1–3 → falla</li>
+    </ul>
+
+    <h3>Daños</h3>
+    <ul>
+        <li>Zorro: 1 daño, 2 por la espalda.</li>
+        <li>Oso: 2 daños.</li>
+        <li>Zarigüeya: esquiva un ataque si no atacó antes.</li>
+        <li>Alce: mueve 3 casillas.</li>
+        <li>Robot aliado: bloquea un ataque cada 3 turnos.</li>
+        <li>Robot malo: 3 vidas.</li>
+        <li>Pato: 1 vida, no ataca.</li>
+    </ul>
+
+    <h3>Turnos</h3>
+    <ol>
+        <li>Pato</li>
+        <li>Robots</li>
+        <li>Animales</li>
+    </ol>
+
+    <h3>Condiciones de Victoria</h3>
+    <ul>
+        <li>Robots ganan si matan al Pato antes del turno 20.</li>
+        <li>Animales ganan si el Pato sobrevive hasta el turno 20.</li>
+    </ul>
+</section>
+
+<!-- ===========================
+            ACERCA
+=========================== -->
+<section id="acerca">
+    <h2>Acerca</h2>
+
+    <p>
+        Este proyecto comenzó como un juego de mesa físico y evolucionó 
+        a una versión digital como parte del trabajo semestral. El proceso
+        incluyó diseño del mapa, creación del sistema de turnos, adaptación
+        de reglas, desarrollo del prototipo digital y documentación.
+    </p>
+
+    <p>
+        Se utilizaron herramientas como editores de imagen, motores de juego,
+        repositorios GitHub, y asistencia de IA para estructurar información,
+        generar texto, apoyar en documentación y refinar ideas. Cada integrante
+        aportó en áreas como arte, programación, documentación y pruebas.
+    </p>
+
+    <p>
+        El objetivo final es mostrar un videojuego funcional, responsivo y con
+        mecánicas fieles a la versión de tablero.
+    </p>
+</section>
 
 <script>
 /* ===========================
@@ -767,7 +972,6 @@ function enemyInFront(unit) {
   return candidato;
 }
 
-
 function attackedFromBehind(attacker, target) {
   const frontDir = target.frontDirection();
   const behindCol = target.col - frontDir;
@@ -1184,6 +1388,7 @@ function startGame() {
 
 function resizeCanvas() {
   const wrapper = document.getElementById('canvas-wrapper');
+  if (!wrapper) return;
   const w = wrapper.clientWidth;
   const h = wrapper.clientWidth * 1.4; // más alto
   canvas.width = w;
@@ -1195,5 +1400,6 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 sprites.mapa.onload = resizeCanvas;
 </script>
+
 </body>
 </html>
