@@ -46,17 +46,16 @@
             color: #004900;
         }
 
-       .juego {
-    width: 100%;
-    min-height: 500px;
-    background: #ddf3e5;
-    border: 2px dashed #00ffa6;
-    border-radius: 10px;
-    padding: 16px;
-    box-sizing: border-box;
-    position: relative;   /* 👈 AÑADE ESTO */
-}
-
+        .juego {
+            width: 100%;
+            min-height: 500px;
+            background: #ddf3e5;
+            border: 2px dashed #00ffa6;
+            border-radius: 10px;
+            padding: 16px;
+            box-sizing: border-box;
+            position: relative;
+        }
 
         .personajes {
             display: flex;
@@ -151,7 +150,6 @@
             border-radius: 999px;
             padding: 6px 14px;
             font-size: 0.85rem;
-            font-weight: 600;
             cursor: pointer;
             background: #23c36b;
             color: #02100a;
@@ -270,18 +268,18 @@
             margin:2px 0;
         }
 
-     #config-overlay {
-    position:absolute;          /* 👈 ya no fixed */
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;               /* solo dentro de .juego */
-    background:rgba(0,0,0,.75);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:20;
-}
+        #config-overlay {
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,.75);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:20;
+        }
         #config-card {
             background:#04130a;
             border-radius:14px;
@@ -378,7 +376,7 @@
 
           <div id="right-panel">
             <div id="info-turno">
-              <div><strong>Ronda:</strong> <span id="lbl-round">1</span> / 20</div>
+              <div><strong>Ronda:</strong> <span id="lbl-round">1</span> / 30</div>
               <div><strong>Turno:</strong> <span id="lbl-faction">-</span></div>
               <div><strong>Jugadores del bando:</strong> <span id="lbl-player">-</span></div>
             </div>
@@ -437,7 +435,7 @@
            Entre ellos está también un robot aliado, uno que, al igual que Roz,
             desarrolla conciencia y decide proteger la vida en lugar de destruirla
             . Ahora, animales y un robot arrepentido deben colaborar para impedir
-             que la oleada mecánica capture al Pato antes del turno 20 y 
+             que la oleada mecánica capture al Pato antes del turno 30 y 
              desequilibre para siempre la paz del ecosistema.
     </p>
 
@@ -478,7 +476,7 @@
         <li>Oso: 2 daños.</li>
         <li>Zarigüeya: esquiva un ataque si no atacó antes.</li>
         <li>Alce: mueve 3 casillas.</li>
-        <li>Robot aliado: bloquea un ataque cada 3 turnos.</li>
+        <li>Robot aliado: bloquea un ataque cada 3 turnos del bando de Animales y solo puede atacar cada 3 turnos propios.</li>
         <li>Robot malo: 3 vidas.</li>
         <li>Pato: 1 vida, no ataca.</li>
     </ul>
@@ -492,8 +490,8 @@
 
     <h3>Condiciones de Victoria</h3>
     <ul>
-        <li>Robots ganan si matan al Pato antes del turno 20.</li>
-        <li>Animales ganan si el Pato sobrevive hasta el turno 20.</li>
+        <li>Robots ganan si matan al Pato antes del turno 30.</li>
+        <li>Animales ganan si el Pato sobrevive hasta el turno 30.</li>
     </ul>
 </section>
 
@@ -520,8 +518,6 @@
     <p>
         El objetivo final es mostrar un videojuego funcional, responsivo y con
         mecánicas fieles a la versión de tablero.
-
-        
     </p>
     <p>
         Puedes consultar el repositorio completo del proyecto en 
@@ -531,8 +527,6 @@
            esta página de GitHub
         </a>.
     </p>
-
-
 </section>
 
 <script>
@@ -725,7 +719,8 @@ class Unit {
     this.dead = false;
     this.hasDodged = false;
     this.hasAttacked = false;
-    this.blockCooldown = 0;
+    this.blockCooldown = 0;   // cooldown de bloqueo
+    this.attackCooldown = 0;  // cooldown de ataque (solo robot aliado)
   }
 
   movementPoints() {
@@ -768,7 +763,7 @@ class Unit {
       case 'alce':
         return 'Puede moverse hasta 3 casillas por turno.';
       case 'robot_aliado':
-        return 'Bloquea un ataque cada cierto tiempo. Daño estándar (1). Está del lado de los animales.';
+        return 'Bloquea un ataque cada 3 turnos del bando de Animales y solo puede atacar cada 3 turnos propios. Daño estándar (1).';
       case 'robot_malo':
         return 'Se mueve 2 casillas (1 en montaña). Daño 1.';
       default:
@@ -1092,7 +1087,19 @@ function updateSelectedInfo() {
 
 function startTurn() {
   if (gameOver) return;
+
   currentFaction = TURN_ORDER[turnIndex];
+
+  // Cooldowns del robot aliado SOLO cuando empieza turno de Animales
+  if (currentFaction === FACTION.ANIMALS) {
+    for (const u of units) {
+      if (u.faction === FACTION.ANIMALS && u.type === 'robot_aliado') {
+        if (u.blockCooldown > 0) u.blockCooldown--;
+        if (u.attackCooldown > 0) u.attackCooldown--;
+      }
+    }
+  }
+
   reachableCells = [];
   pendingTarget = null;
   hasMovedThisTurn = false;
@@ -1106,17 +1113,16 @@ function startTurn() {
 
 function endTurn() {
   if (gameOver) return;
-  for (const u of units) {
-    if (u.type === 'robot_aliado' && u.blockCooldown>0) u.blockCooldown--;
-  }
+
+  // Ya no tocamos cooldowns aquí, solo cambiamos de bando / ronda
   turnIndex++;
   if (turnIndex >= TURN_ORDER.length) {
     turnIndex = 0;
     round++;
-    if (round > 20) {
+    if (round > 30) {
       const pato = units.find(u=>u.id==='pato');
       if (pato && !pato.dead) {
-        endGame(FACTION.ANIMALS,'El pato sobrevivió hasta la ronda 20.');
+        endGame(FACTION.ANIMALS,'El pato sobrevivió hasta la ronda 30.');
         return;
       }
     }
@@ -1199,11 +1205,20 @@ canvas.addEventListener('click', e => {
     hasMovedThisTurn = true;
     reachableCells = [];
     drawBoard();
+
     const enemy = enemyInFront(selectedUnit);
     if (enemy && !hasAttackedThisTurn && selectedUnit.faction!==FACTION.PATO) {
-      pendingTarget = enemy;
-      btnRoll.disabled = false;
-      log(`${selectedUnit.name} tiene a ${enemy.name} al frente. Puedes atacar.`);
+
+      if (selectedUnit.type === 'robot_aliado' && selectedUnit.attackCooldown > 0) {
+        pendingTarget = null;
+        btnRoll.disabled = true;
+        log(`El Robot aliado aún está recargando su ataque (${selectedUnit.attackCooldown} turno(s) del jugador por esperar).`);
+      } else {
+        pendingTarget = enemy;
+        btnRoll.disabled = false;
+        log(`${selectedUnit.name} tiene a ${enemy.name} al frente. Puedes atacar.`);
+      }
+
     } else {
       pendingTarget = null;
       btnRoll.disabled = true;
@@ -1220,8 +1235,23 @@ canvas.addEventListener('click', e => {
     selectedUnit = u;
     reachableCells = hasMovedThisTurn ? [] : bfsReachable(u);
     const enemy = enemyInFront(u);
-    pendingTarget = (enemy && !hasAttackedThisTurn && u.faction!==FACTION.PATO) ? enemy:null;
-    btnRoll.disabled = !pendingTarget;
+
+    if (enemy && !hasAttackedThisTurn && u.faction!==FACTION.PATO) {
+
+      if (u.type === 'robot_aliado' && u.attackCooldown > 0) {
+        pendingTarget = null;
+        btnRoll.disabled = true;
+        log(`El Robot aliado aún está recargando su ataque (${u.attackCooldown} turno(s) del jugador por esperar).`);
+      } else {
+        pendingTarget = enemy;
+        btnRoll.disabled = false;
+      }
+
+    } else {
+      pendingTarget = null;
+      btnRoll.disabled = true;
+    }
+
     updateSelectedInfo();
     drawBoard();
     log(`Seleccionaste a ${u.name}.`);
@@ -1311,6 +1341,12 @@ btnRoll.addEventListener('click', ()=>{
       }else{
         log('Ataque fallido.');
       }
+
+      // Ataque del robot aliado entra en cooldown de 3 turnos de Animales
+      if (selectedUnit.type === 'robot_aliado') {
+        selectedUnit.attackCooldown = 3;
+      }
+
       hasAttackedThisTurn=true;
       pendingTarget=null;
       drawBoard();
@@ -1391,7 +1427,7 @@ function startGame() {
   currentFaction=TURN_ORDER[0];
   gameOver=false;
   logDiv.innerHTML='';
-  log('Comienza la partida. Objetivo Robots: eliminar al pato. Objetivo Animales: mantenerlo vivo 20 rondas.');
+  log('Comienza la partida. Objetivo Robots: eliminar al pato. Objetivo Animales: mantenerlo vivo 30 rondas.');
   resizeCanvas();
   startTurn();
 }
